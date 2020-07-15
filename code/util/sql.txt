@@ -1,0 +1,88 @@
+STEP 1: select spectroscopic id
+=============================================================
+SELECT p.objid
+INTO MYDB.specDR13_id
+FROM PhotoObj P join SpecObj as S on P.objID = s.BestObjID
+WHERE p.type=6 
+  AND p.clean=1 
+  AND p.probPSF_u =1 
+  AND p.probPSF_g =1 
+  AND p.probPSF_r =1 
+  AND p.probPSF_i =1 
+  AND p.probPSF_z =1 
+  AND s.class!='GALAXY'
+  AND p.psfMag_u-0.75*p.extinction_u between 15 and 22
+  AND p.psfMag_g-0.75*p.extinction_g  between 15 and 22 
+  AND p.psfMag_r-0.75*p.extinction_r  between 15 and 20 
+  AND p.psfMag_i-0.75*p.extinction_i  between 15 and 22
+  AND p.psfMag_z-0.75*p.extinction_z  between 15 and 22
+  
+  AND p.psfMagErr_u<0.15
+  AND p.psfMagErr_g<0.1
+  AND p.psfMagErr_r<0.1
+  AND p.psfMagErr_i<0.1
+  AND p.psfMagErr_z<0.1
+order by 1
+=============================================================
+STEP 2: GET SPEC DATA
+select 
+  class, subclass,
+  u-g as ug, g-r as gr, r-i as ri, i-z as iz,
+  u-r as ur, g-i as gi, r-z as rz, 
+  u-i as ui, g-z as gz, 
+  u-z as uz, 
+  
+  u5-g5 as ug5, g5-r5 as gr5, r5-i5 as ri5, i5-z5 as iz5, 
+  u5-r5 as ur5, g5-i5 as gi5, r5-z5 as rz5, 
+  u5-i5 as ui5, g5-z5 as gz5, 
+  u5-z5 as uz5
+into [myscratch:default].specDR13
+from (
+  SELECT
+    s.class as class, s.subclass as subclass,
+    (p.psfMag_u-0.75*p.extinction_u) as u,
+    (p.psfMag_g-0.75*p.extinction_g) as g,
+    (p.psfMag_r-0.75*p.extinction_r) as r,
+    (p.psfMag_i-0.75*p.extinction_i) as i,
+    (p.psfMag_z-0.75*p.extinction_z) as z,
+    (p.psfMag_u-0.5*p.extinction_u) as u5,
+    (p.psfMag_g-0.5*p.extinction_g) as g5,
+    (p.psfMag_r-0.5*p.extinction_r) as r5,
+    (p.psfMag_i-0.5*p.extinction_i) as i5,
+    (p.psfMag_z-0.5*p.extinction_z) as z5
+    
+
+FROM  PhotoObj as p left join SpecObj as s on p.objid=s.BestObjID
+WHERE p.objid in (select objid from MYDB.specDR13_id) 
+) x
+# order by 1
+=============================================================
+download wget
+=============================================================
+
+STEP 3: GET PHOTO ObjID
+SELECT p.objid
+INTO MYDB.photoDR13_ext0
+FROM PhotoObj as P 
+WHERE p.type=6 
+  AND p.clean=1 
+  AND p.probPSF_u =1 
+  AND p.probPSF_g =1 
+  AND p.probPSF_r =1 
+  AND p.probPSF_i =1 
+  AND p.probPSF_z =1 
+  
+  AND p.psfMag_u-0.75*p.extinction_u between 15 and 22
+  AND p.psfMag_g-0.75*p.extinction_g  between 15 and 22 
+  AND p.psfMag_r-0.75*p.extinction_r  between 15 and 20 
+  AND p.psfMag_i-0.75*p.extinction_i  between 15 and 22
+  AND p.psfMag_z-0.75*p.extinction_z  between 15 and 22
+  
+  AND p.psfMagErr_u<0.15
+  AND p.psfMagErr_g<0.1
+  AND p.psfMagErr_r<0.1
+  AND p.psfMagErr_i<0.1
+  AND p.psfMagErr_z<0.1
+order by 1
+=============================================================
+STEP 4
