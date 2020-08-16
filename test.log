@@ -1,0 +1,6 @@
+INFO:root:Output directory is ./runs/test
+INFO:root:  Loading # 2 image(s) 
+INFO:root:Loaded dataset with shapes: 1004 1344
+INFO:root:Loaded dataset with shapes: 1004 1344
+INFO:root: Bulk Shape:  2
+INFO:root: Bulk Shape:  (2698752, 8)
