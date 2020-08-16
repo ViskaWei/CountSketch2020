@@ -15,11 +15,11 @@ from cancer.prepro.dataset import Dataset
 from util.prepro import get_col_norm_pd,get_minmax_pd,get_encode_stream
 
 ############## Process Data #################
-def process_dataset_pc(data_dir, num, pca_comp,ISSMTH, SMTH, TEST):   
-    images = Dataset(data_dir, num)
+def process_dataset_pc(dataDir, num, pca_comp,ISSMTH, SMTH, TEST):   
+    ds = Dataset(ISSMTH, SMTH)
+    ds.load(dataDir, num=1, ini = 0)
     num  = images.N_img  #in case: num > N_images
 #     pca_combined = np.zeros([images.layer, images.layer])
-    print(f'Processing {num} [test :{TEST}] images with original size {images.size} ')
     with ThreadPoolExecutor() as executor: 
         futures = []
         for idx in range(num):
@@ -32,13 +32,6 @@ def process_dataset_pc(data_dir, num, pca_comp,ISSMTH, SMTH, TEST):
         pc = run_step_pc(mul_comb, pca_comp)
     return images.data1D, pc
 
-def run_step_multiple(idx,images, ISSMTH, SMTH, TEST):
-    if TEST:
-        images.get_test_data(idx, ISSMTH, SMTH)
-    else:
-        images.get_data(idx, ISSMTH, SMTH)
-    images.data1D[idx] = np.reshape(images.data[idx], [images.ver*images.hor, images.layer]).astype('float')
-    return images.data1D[idx].T.dot(images.data1D[idx])
 
 def run_step_pc(mul_comb, pca_comp):
     # use svd since its commputational faster
@@ -47,7 +40,7 @@ def run_step_pc(mul_comb, pca_comp):
     assert np.allclose(u, v.T)
     print('Explained Variance Ratio', np.round(s/sum(s),3))
     pc = u[:,:pca_comp]
-    np.savetxt('eval.txt',
+    # np.savetxt('eval.txt',
     return pc
 
 def process_pca(data1Ds, pc, num):
