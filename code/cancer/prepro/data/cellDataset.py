@@ -26,7 +26,7 @@ class CellDataset():
         self.filePath = filePath[self.ini:self.ini + self.nImg]
         logging.info("  Loading # {} image(s) ".format(len(self.filePath)))
     
-    def load_ith_item(self,idx, isTest=False, isSmooth=True, smooth_sig=None):
+    def load_ith_item(self,idx, isTest, smooth=None):
         with open(self.filePath[idx],'rb') as f_id:
             img = np.fromfile(f_id, count=np.prod(self.size),dtype = np.uint16)
             img = np.reshape(img, self.size)
@@ -36,16 +36,16 @@ class CellDataset():
                 img = img[-self.ver:,-self.hor:,:]
             logging.info("Loaded dataset with shapes: {} {}".format(self.ver,self.hor))
 
-            if isSmooth: 
-                img=gaussian_filter(img,sigma=smooth_sig)
-                logging.info("  Smoothing with sigma:  {}".format(smooth_sig))
+            if smooth is not None: 
+                img=gaussian_filter(img,sigma=smooth)
+                logging.info("  Smoothing with sigma:  {}".format(smooth))
             
             img= np.reshape(img, [self.ver*self.hor, self.layer]).astype('float')
             self.data[idx]=img
         return img.T.dot(img)
 
-    def loader(self, isTest, isSmooth, smooth_sig=None):
-        return lambda x: self.load_ith_item(x, isTest, isSmooth, smooth_sig)
+    def loader(self, isTest, smooth=None):
+        return lambda x: self.load_ith_item(x, isTest, smooth)
      
     def load(self, loader, parallel=True):
         if parallel:

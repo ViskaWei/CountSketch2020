@@ -1,14 +1,12 @@
 {
     "in": "./data/bki",
-    "nImg":2,
+    "nImg": 2,
+
+    "test":true,
+    "smooth": 2.0,
     
-    "isTest": true,
-    "isSmooth": true,
-    "smooth-sig": 2.0,
-
-
     "dtype":"uint64",
-    "base":22,
+    "base": 22,
     "dim": 8,
 
     "mode":"exact",
@@ -19,5 +17,9 @@
     
     "seed": 112,
     "name": "test",
-    "out": "./runs/test"
+    "out": "./runs/test",
+    "save": true
+    
 }
+
+

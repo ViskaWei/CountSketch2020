@@ -12,6 +12,7 @@ class Script():
         self.args = None
         self.out = None
         self.name='test'
+        self.dim=None
         self.debug=False
         ######################### Init ########################
         
@@ -20,15 +21,11 @@ class Script():
         parser.add_argument('--seed', type=int, help='Set random\n' )
         parser.add_argument('--name', type=str, help='save model name\n')
         parser.add_argument('--out', type=str, help='output dir\n')
+        parser.add_argument('--dim', type=int, default=None,  help='Latent Representation dimension\n')
         
     def create_parser(self):
         self.parser = argparse.ArgumentParser()
         self.add_args(self.parser)
-        # self.add_subparsers(self.parser)
-
-    # def add_subparsers(self, parser):
-    #     # Default behavior doesn't user subparsers
-    #     self.add_args(parser)
     
     def parse_args(self):
         if self.args is None:
@@ -66,7 +63,10 @@ class Script():
             self.name =self.args['name']
 
     def apply_input_args(self):
-        pass
+        if 'dim' in self.args and self.args['dim'] is not None:
+            self.dim = self.args["dim"]
+        else:
+            raise "--dim latent dimension not specified"
   
     def apply_output_args(self):        
         if 'out' in self.args and self.args['out'] is not None:
