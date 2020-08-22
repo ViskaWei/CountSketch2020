@@ -3,6 +3,7 @@ import numpy as np
 import copy
 import torch
 LARGEPRIME = 2**61-1
+# torch.random.manual_seed(42)
 class CSVec(object):
     def __init__(self, d, c, r, k, device=None):
         self.r = r # num of rows
@@ -18,8 +19,8 @@ class CSVec(object):
         self.device = device
         self.table = torch.zeros((r, c), device=self.device)
 
-        rand_state = torch.random.get_rng_state()
         torch.random.manual_seed(42)
+        rand_state = torch.random.get_rng_state()
         self.hashes = torch.randint(0, LARGEPRIME, (self.r, 6),
                                dtype=torch.int64, device="cpu")
         torch.random.set_rng_state(rand_state)
@@ -31,7 +32,7 @@ class CSVec(object):
         self.h6 = self.hashes[:,5:6]
 
         self.topk = torch.zeros((k,2), dtype=torch.int64, device=self.device)        
-    
+        
 #     def accumulateVec(self, vec1, vec2):
 #         vec1 = vec1.to(self.device)
 #         vec2 = vec2.to(self.device)

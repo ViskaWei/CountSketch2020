@@ -2,6 +2,7 @@ import logging
 import os
 import time
 import numpy as np
+import pickle
 
 from cancer.scripts.script import Script
 from cancer.prepro.data.cellDataset import CellDataset
@@ -40,7 +41,7 @@ class CellPipeline(Script):
 
     def apply_prepro_args(self):
         if 'cutoff' in self.args and self.args['cutoff'] is not None:
-            self.cutoff=pickle.load(open(f'{wdir}/cutoff.txt','rb')) 
+            self.cutoff=pickle.load(open(self.args['cutoff'],'rb')) 
         
 
     def run(self):
@@ -50,13 +51,10 @@ class CellPipeline(Script):
 
     def run_step_load(self):
         ds=CellDataset(self.args['in'] ,self.args['nImg'])
-        loader_fn=ds.loader(self.args['test'], smooth=self.smooth)  
-        ds.load(loader_fn, True)
+        img_loader=ds.get_img_loader(self.args['test'], smooth=self.smooth)  
+        ds.load(img_loader, True)
         ds.get_pc(self.dim)
         self.vecs = ds.get_bulk()  
-
-        if self.args['save']:
-            np.savetxt( self.name, self.vecs)
 
     def run_step_save(self):
         if self.args['save']:  
@@ -64,13 +62,17 @@ class CellPipeline(Script):
 
     def run_step_ball(self):
         bulk=Bulk(self.vecs)
+        intensity=get_intensity()
         if self.cutoff is None:
-            bulk.get_cutoff()
+            self.cutoff = bulk.get_cutoff(intensity)
+            pickle.dump(cut,open(f'{self.out}/cutoff.txt','wb'))
+        logging.info(" cutoff @:  {}".format(self.cutoff))
+
+        self.get_unit_ball(self.cutoff)
 
 
-     else:
-            self.cutoff = run_step_cutoff(intensity) 
-            pickle.dump(cut,open(f'{wdir}/cutoff.txt','wb'))
+    
+        
    
 
  

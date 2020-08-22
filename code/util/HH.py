@@ -4,6 +4,7 @@ import pandas as pd
 import copy
 import torch
 import time
+import logging
 from collections import Counter
 import warnings
 warnings.simplefilter("ignore")
@@ -13,13 +14,10 @@ from util.csvec import CSVec
 def get_exact_HH(stream,topk):
     print(f'=============exact counting HHs==============')
     t0=time.time()
-    count=Counter(stream)
-    HH=sorted(count,key=count.get,reverse=True)
-    HHtopk=HH
-    freq=[count[HHtopk[ii]] for ii in range(len(HHtopk))]
+    exactHH=np.array(Counter(stream).most_common())
     t=time.time()-t0
     print('exact counting time:{:.2f}'.format(t))
-    return HHtopk,freq,t
+    return exactHH[:,0], exactHH[:,1], t
 
 def get_HH_pd(stream,base,ftr_len, dtype, exact, topk, r=16, d=1000000,c=None,device=None):
     if exact:

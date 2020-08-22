@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python code/cancer/scripts/import_cancer.py $@
+python -m cProfile -o temp.dat code/cancer/scripts/import_cancer.py $@

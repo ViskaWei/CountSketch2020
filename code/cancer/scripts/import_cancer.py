@@ -15,6 +15,7 @@ from cancer.prepro.pipelines.cellPipeline import CellPipeline
 def main():
     p=CellPipeline()
     p.prepare()
+    p.run()
 # isTest=True
 # isSmooth=False
 # dataDir = r'./data/bki'  

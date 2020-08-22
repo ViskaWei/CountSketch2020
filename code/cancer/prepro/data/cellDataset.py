@@ -44,15 +44,15 @@ class CellDataset():
             self.data[idx]=img
         return img.T.dot(img)
 
-    def loader(self, isTest, smooth=None):
+    def get_img_loader(self, isTest, smooth=None):
         return lambda x: self.load_ith_item(x, isTest, smooth)
      
-    def load(self, loader, parallel=True):
+    def load(self, img_loader, parallel=True):
         if parallel:
             with ThreadPoolExecutor() as executor: 
                     futures = []
                     for idx in range(self.nImg):
-                        futures.append(executor.submit(loader, idx))
+                        futures.append(executor.submit(img_loader, idx))
                         # print(f" No.{idx} image is loaded")
                     self.cov = np.zeros([self.layer,self.layer])
                     for future in as_completed(futures):
