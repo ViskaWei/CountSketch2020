@@ -1,6 +1,6 @@
 {
     "in": "./data/bki",
-    "nImg": 2,
+    "nImg": 1,
 
     "test":true,
     "smooth": 2.0,
@@ -18,7 +18,7 @@
     "seed": 112,
     "name": "test",
     "out": "./runs/test",
-    "save": true
+    "save": false
     
 }
 

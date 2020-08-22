@@ -4,11 +4,9 @@ import pandas as pd
 import collections
 
 class Bulk():
-    def __init__(vecs):
+    def __init__(self, vecs):
         self.vecs=vecs
-        self.intensity=None
-
-        # self.get_intensity()
+        self.dim=len(vecs[0])
     
     def get_intensity(self):
         intensity = (np.sum(self.vecs**2, axis = 1))**0.5
@@ -27,23 +25,46 @@ class Bulk():
         cutoff = np.exp(cutoff_log).round()
         return cutoff
 
-    def get_unit_ball(self, cut):
+    def get_min_max_norm(self, df):
+        vmin,vmax=df.min().min(), df.max().max()
+        df_norm=((df-vmin)/(vmax-vmin))
+        assert ((df_norm>=0) & (df_norm<=1)).all().all()
+        return df_norm
+
+    def get_unit_ball(self, intensity, cut):
         mask = intensity > cut
-        print('norm length',np.sum(mask))
+        try: 
+            m=np.sum(mask)
+            assert  m > 1e3
+            logging.info('stream length m = {}'.format(m))
+        except:
+            raise 'stream size too small, lower cutoff or add samples'
         mask=mask.astype('bool')
-        intencut=intensity[mask]
-        df_pca=pd.DataFrame(pca_result[mask],columns=list(range(pca_comp)))
-        df_uni= np.divide(df_pca, intencut[:,None])
-        df_norm=get_minmax_pd(df_uni,r=r, vmin=None, vmax=None)
-        if ONPCA:
-            df_p2=get_col_norm_pd(df_pca[[1,2]],r=r,w=False,std=False)
-            df_norm=pd.concat([df_p2,df_norm],axis=1)
-        if ONINT: 
-            intencut=(intencut-np.mean(intencut))/np.std(intencut)
-            df_inten=pd.DataFrame(intencut, columns=['int'])
-            df_inten=get_col_norm_pd(df_inten,r=r,w=False,std=False)
-            df_norm=pd.concat([df_inten,df_norm],axis=1)
-        ftr_len=len(df_norm.keys())
-        print(df_norm)
-        df_norm=pd.DataFrame(df_norm.values, columns=list(range(ftr_len)))
-        return df_norm, mask, ftr_len
+        intensityCut=intensity[mask]
+        df_pca=pd.DataFrame(self.vecs[mask],columns=[f'd{i}' for i in range(self.dim)])
+        df_unit= np.divide(df_pca, intensityCut[:,None])
+        df_norm=self.get_min_max_norm(df_unit)
+        return df_norm, mask
+
+    
+
+    # def get_unit_ball(self, intensity, cut):
+    #     mask = intensity > cut
+    #     logging.info('stream length m = {}'.format(np.sum(mask)))
+    #     mask=mask.astype('bool')
+    #     intensityCut=intensity[mask]
+    #     df_pca=pd.DataFrame(self.vecs[mask],columns=[f'd{i}' for i in range(self.dim)])
+    #     df_uni= np.divide(df_pca, intensityCut[:,None])
+    #     df_norm=get_minmax_pd(df_uni,r=r, vmin=None, vmax=None)
+    #     if ONPCA:
+    #         df_p2=get_col_norm_pd(df_pca[[1,2]],r=r,w=False,std=False)
+    #         df_norm=pd.concat([df_p2,df_norm],axis=1)
+    #     if ONINT: 
+    #         intensityCut=(intensityCut-np.mean(intensityCut))/np.std(intensityCut)
+    #         df_inten=pd.DataFrame(intensityCut, columns=['int'])
+    #         df_inten=get_col_norm_pd(df_inten,r=r,w=False,std=False)
+    #         df_norm=pd.concat([df_inten,df_norm],axis=1)
+    #     ftr_len=len(df_norm.keys())
+    #     print(df_norm)
+    #     df_norm=pd.DataFrame(df_norm.values, columns=list(range(ftr_len)))
+    #     return df_norm, mask, ftr_len

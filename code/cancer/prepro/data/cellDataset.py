@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 #os.environ['DATASET_PATH'] = r'../../../../../../bki/flatw/M21_1/'
 
 class CellDataset():
-    def __init__(self, fileDir, nImg, size = [1004,1344,35]):
+    def __init__(self, fileDir, nImg=None, size = [1004,1344,35]):
         self.filePath=None
         self.nImg=nImg
         self.ini=0
@@ -23,7 +23,11 @@ class CellDataset():
 
     def get_file_path(self, fileDir):
         filePath = [os.path.join(fileDir, f) for f in os.listdir(fileDir) if f.endswith('.fw')]
-        self.filePath = filePath[self.ini:self.ini + self.nImg]
+        if (self.nImg is None) or (self.nImg== -1):
+            self.filePath=filePath
+            self.nImg=len(filePath)
+        else:
+            self.filePath = filePath[self.ini:self.ini + self.nImg]
         logging.info("  Loading # {} image(s) ".format(len(self.filePath)))
     
     def load_ith_item(self,idx, isTest, smooth=None):

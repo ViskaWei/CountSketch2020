@@ -22,7 +22,6 @@ def get_std_pd(df_data, vmean, vstd, sig):
     assert (df_snorm.min().min()>=0) & (df_snorm.max().max()<=1)
     return df_snorm
 
-
 def get_col_norm_pd(df,r=0.01,w=False,std=False): 
     df1=(df-df.mean())/df.std() if std else df
     vmin=df1.quantile(r)
