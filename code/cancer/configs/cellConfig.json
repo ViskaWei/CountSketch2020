@@ -2,7 +2,7 @@
     "in": "./data/bki",
     "nImg": 1,
 
-    "test":true,
+    "test":false,
     "smooth": 2.0,
     
     "dtype":"uint64",
@@ -10,15 +10,21 @@
     "dim": 8,
 
     "mode":"exact",
-    "topk":1000,
+    "topk":0.4,
 
     "nCluster": 10,
     "sci": false,
-    
+
+    "cutoff": "./home/swei20/cancerHH/AceCanZ/runs/test/cutoff.txt",
+
     "seed": 112,
     "name": "test",
-    "out": "./runs/test",
-    "save": false
+    "out": "./runs/t1",
+    "saveMat": false,
+    "saveMask": true,
+    "saveStream": false,
+    "saveHHs": true,
+    "maskId": 1
     
 }
 

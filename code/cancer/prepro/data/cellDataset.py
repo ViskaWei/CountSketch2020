@@ -35,20 +35,22 @@ class CellDataset():
             img = np.fromfile(f_id, count=np.prod(self.size),dtype = np.uint16)
             img = np.reshape(img, self.size)
  
-            if isTest:
-                self.ver, self.hor = 400, 300              
+            if isTest:              
                 img = img[-self.ver:,-self.hor:,:]
-            logging.info("Loaded dataset with shapes: {} {}".format(self.ver,self.hor))
 
             if smooth is not None: 
                 img=gaussian_filter(img,sigma=smooth)
-                logging.info("  Smoothing with sigma:  {}".format(smooth))
             
             img= np.reshape(img, [self.ver*self.hor, self.layer]).astype('float')
             self.data[idx]=img
         return img.T.dot(img)
 
     def get_img_loader(self, isTest, smooth=None):
+        if isTest:
+            self.ver, self.hor = 400, 300
+        logging.info("  Loaded dataset with shapes: {} {}".format(self.ver,self.hor))
+        if smooth is not None:
+            logging.info("  Smoothing with sigma:  {}".format(smooth))
         return lambda x: self.load_ith_item(x, isTest, smooth)
      
     def load(self, img_loader, parallel=True):
@@ -67,10 +69,10 @@ class CellDataset():
 
     def get_pc(self, dim):
         # use svd since its commputational faster
-        print(f"=============== PCA: {dim} ===============")
+        logging.info("=============== PCA: {} ===============".format(dim))
         u,s,v = np.linalg.svd(self.cov)
         assert np.allclose(u, v.T)
-        print('Explained Variance Ratio', np.round(s/sum(s),3))
+        logging.info('Explained Variance Ratio {}'.format(np.round(s/sum(s),3)))
         self.pc = u[:,:dim]
 
     def get_bulk(self):

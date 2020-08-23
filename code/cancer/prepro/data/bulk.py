@@ -4,12 +4,12 @@ import pandas as pd
 import collections
 
 class Bulk():
-    def __init__(self, vecs):
-        self.vecs=vecs
-        self.dim=len(vecs[0])
+    def __init__(self, mat):
+        self.mat=mat
+        self.dim=len(mat[0])
     
     def get_intensity(self):
-        intensity = (np.sum(self.vecs**2, axis = 1))**0.5
+        intensity = (np.sum(self.mat**2, axis = 1))**0.5
         return intensity
     
     def get_cutoff(self, intensity, N_bins = 100, N_sigma = 3):
@@ -24,7 +24,7 @@ class Bulk():
         cutoff_log = N_sigma* sigma + mu
         cutoff = np.exp(cutoff_log).round()
         return cutoff
-
+    
     def get_min_max_norm(self, df):
         vmin,vmax=df.min().min(), df.max().max()
         df_norm=((df-vmin)/(vmax-vmin))
@@ -41,19 +41,19 @@ class Bulk():
             raise 'stream size too small, lower cutoff or add samples'
         mask=mask.astype('bool')
         intensityCut=intensity[mask]
-        df_pca=pd.DataFrame(self.vecs[mask],columns=[f'd{i}' for i in range(self.dim)])
+        df_pca=pd.DataFrame(self.mat[mask],columns=[f'd{i}' for i in range(self.dim)])
         df_unit= np.divide(df_pca, intensityCut[:,None])
         df_norm=self.get_min_max_norm(df_unit)
         return df_norm, mask
 
-    
+    # 
 
     # def get_unit_ball(self, intensity, cut):
     #     mask = intensity > cut
     #     logging.info('stream length m = {}'.format(np.sum(mask)))
     #     mask=mask.astype('bool')
     #     intensityCut=intensity[mask]
-    #     df_pca=pd.DataFrame(self.vecs[mask],columns=[f'd{i}' for i in range(self.dim)])
+    #     df_pca=pd.DataFrame(self.mat[mask],columns=[f'd{i}' for i in range(self.dim)])
     #     df_uni= np.divide(df_pca, intensityCut[:,None])
     #     df_norm=get_minmax_pd(df_uni,r=r, vmin=None, vmax=None)
     #     if ONPCA:
