@@ -15,6 +15,7 @@ from cancer.postpro.project import get_umap_pd,get_kmean_lbl,get_pred_stream
 class CellPipeline(Script):
     def __init__(self, logging=True):
         super().__init__()
+        self.nImg=None
         self.dim=None
         self.smooth=None
         self.cutoff=None
@@ -59,6 +60,9 @@ class CellPipeline(Script):
     def apply_dataset_args(self):
         if 'in' not in self.args or self.args['in'] is None:
             raise "--in input directory is not specified"
+
+        if 'nImg' in self.args and self.args['nImg'] is not None:
+            self.nImg=self.args['nImg']
         
         if 'smooth' in self.args and self.args['smooth'] is not None:
             self.smooth=[self.args['smooth'],self.args['smooth'],0]
@@ -95,8 +99,6 @@ class CellPipeline(Script):
         if self.save['mask']:
             if 'maskId' in self.args and self.args['maskId'] is not None:
                 self.save['maskId'] = self.args['maskId']
-                if self.save['maskId'] > self.nImg:
-                    raise "maskId out of range"
         logging.info('saving {}'.format(self.save.items()))
         
 
@@ -109,9 +111,15 @@ class CellPipeline(Script):
 
 
     def run_step_load(self):
-        ds=CellDataset(self.args['in'] ,self.args['nImg'])
+        ds=CellDataset(self.args['in'] ,self.nImg)
         img_loader=ds.get_img_loader(self.args['test'], smooth=self.smooth)  
         ds.load(img_loader, True)
+        self.nImg=ds.nImg
+        if self.save['maskId'] is not None:
+            if self.save['maskId'] >self.nImg:
+                self.save['maskId'] = 0
+                logging.info('maskId out of range, saving 0th img')
+
         ds.get_pc(self.dim)
         mat = ds.get_bulk()
         del ds
@@ -122,15 +130,15 @@ class CellPipeline(Script):
         pass
 
     def save_txt(self, mat, filename):
-        name=f'{self.out}/{self.name}{filename}.txt'
-        logging.info('saving {}'.format(name))
+        name=f'{self.out}/{filename}.txt'
+        logging.info('  saving {}'.format(name))
         np.savetxt( name, mat)
     
-    def save_masks(self,mask, filename):
+    def save_mask(self,mask, filename):
         mask2d=mask.reshape((self.nImg,1004*1344))
         if self.save['maskId'] is None:
             name=f'{self.out}/{filename}_all.txt' 
-            logging.info('saving {}'.format(name))
+            logging.info('  saving {}'.format(name))
             np.savetxt(name, mask)
         else:
             maskId=self.save['maskId']
@@ -140,8 +148,9 @@ class CellPipeline(Script):
             assert idxj-idxi == mask0.sum()
             self.idx=[idxi,idxj,maskId]
             logging.info('idxi, idxj, maskId: {}'.format(self.idx))
-            logging.info('saving mask {}{}'.format(mask0.shape, mask.sum()))
-            np.savetxt(f'{self.out}/{filename}Id{maskId}.txt' , mask0)   
+            logging.info('  saving mask {}{}'.format(mask0.shape, mask.sum()))
+            np.savetxt(f'{self.out}/{filename}Id{maskId}.txt' , mask0)  
+
     
     def run_step_norm(self, mat):
         bulk=Bulk(mat)
@@ -175,7 +184,7 @@ class CellPipeline(Script):
         return HH_pd
 
 
-        
+    
    
 
  

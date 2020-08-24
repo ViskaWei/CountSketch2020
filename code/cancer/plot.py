@@ -19,7 +19,7 @@ cmap_k=sns.color_palette('muted', N_cluster)
 
 # IMG_PATH='/home/swei20/cancerHH/AceCanZ/cancer/lbl_data/M21_1_[46163,12853]_label.png'
 
-IMG_PATH='/home/swei20/cancerHH/AceCanZ/cancer/lbl_data/M21_1_[46163,13653]_label.png'
+IMG_PATH='/home/swei20/cancerHH/AceCanZ/data/cancer_lbl/M21_1_[46163,13653]_label.png'
 lbl = np.array(Image.open(IMG_PATH))
 lbl[lbl==192]=128
 l128=1*((lbl==128)| (lbl==192))
@@ -104,6 +104,7 @@ def plot_CN_all(pred,idxs, l128,l64, cmaps):
         ax1.matshow(mat,cmap=ListedColormap([[0.95,0.95,0.95,1], cmaps[ii]]))
         plot_cancer(ax=ax1,lbl=l128,c='crimson',a=1)
     return None
+    
 def plot_2_clusters_1(final_c10, idx1 =1, idx2 = 7):
     s1 = (final_c10 == idx1)*(1)
     s2 = (final_c10 == idx2)* 1

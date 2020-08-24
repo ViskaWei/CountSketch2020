@@ -64,7 +64,8 @@ class Evalsketch():
                 c1 = self.cs_freq[self.cs_HH == val]
                 # error[key] -= np.min([c1/c0,2])
                 error[key] -= c1/c0
-        return error   
+        return error  
+         
     def plot_rel_error(self, ax = None):
         if ax is None:
             ax = plt.gca()
