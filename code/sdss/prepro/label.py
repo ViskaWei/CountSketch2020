@@ -22,7 +22,7 @@ lu_dict = dict({'I':'#0D2B68',
                    'V': '#FACF4A',
                   'W':'#556B2F'})
 
-def get_subclass_pd(df_label,LBL_PATH='./data/sdss_stars/label.csv'):
+def get_subclass_pd(df_label,LBL_PATH='../data/sdss_stars/label.csv'):
     labeldict_pd=pd.read_csv(LBL_PATH)
     lu_dict={}
     lbl_dict={}

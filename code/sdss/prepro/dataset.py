@@ -27,7 +27,7 @@ def get_prepro_std_pds(df,ftr=None, lbl_str=['class','subclass'],sig=3.0):
     df_snorm=get_std_pd(df_data, vmean, vstd, sig)
     df_lbl=df_lbl.loc[df_snorm.index]
     assert len(df_lbl)==len(df_snorm)
-    df_lbl=get_subclass_pd(df_lbl,LBL_PATH='./data/sdss_stars/label.csv')    
+    df_lbl=get_subclass_pd(df_lbl,LBL_PATH='../data/sdss_stars/label.csv')    
     return df_snorm, vmean,vstd,df_lbl
 
 def prepro_std_specs(SPEC_DATA, ftr=None, sig=3.0, w=True,wpath=None):
